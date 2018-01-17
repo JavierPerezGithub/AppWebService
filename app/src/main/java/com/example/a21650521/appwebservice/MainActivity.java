@@ -6,12 +6,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import model.Pokemon;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,9 +70,24 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
         protected void onPostExecute(Void v) {
-            tv.setText(resultado);
-        }
+            String salida = "";
+            JSONObject  jsonResultado = null;
+            try {
+                jsonResultado = new JSONObject(resultado);
+                JSONArray jsonMainNode = jsonResultado.optJSONArray("results");
 
+                Pokemon poke = null;
+                for (int i=0; i<jsonMainNode.length(); i++){
+                    poke = new Pokemon(jsonMainNode.getJSONObject(i));
+                    salida += poke.toString();
+                }
+                tv.setText(salida);
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
     public void consumirWS(View v) {
         String url = "https://pokeapi.co/api/v2/pokemon/";
